@@ -27,16 +27,30 @@ rm -rf ~/.claude/skills/ui-ux-pro-max        # si installé en global
 Supprime aussi le fichier `skills-lock.json` créé par la CLI `skills` à la
 racine du projet, s'il ne référence plus rien.
 
-## task-observer : les deux résidus
+## task-observer : les trois résidus
 
 ```bash
 rm -rf ~/.claude/skills/task-observer
 rm -rf ~/.claude/skill-observations          # son journal
+rm -rf ~/.agents                             # laissé par la CLI skills
 ```
 
 Puis retire le bloc `## task-observer` de `~/.claude/CLAUDE.md`. L'installeur
 l'ajoute à la fin du fichier, il commence par `## task-observer` et finit par
 la ligne `6. Langue du journal et des propositions : français.`
+
+### Allègement sans désinstallation
+
+Le skill arrive avec 3,1 Mo de logos PNG qui ne servent à rien une fois
+installé :
+
+```bash
+rm -f ~/.claude/skills/task-observer/*.png   # 3,5 Mo -> 400 Ko
+```
+
+Ça ne réduit pas le coût en contexte, qui vient du `SKILL.md` lui-même
+(52 Ko, environ 13 000 tokens à chaque déclenchement). Pour couper ce
+coût-là, il faut désactiver le skill, pas l'alléger.
 
 ## claude-mem : la procédure complète
 

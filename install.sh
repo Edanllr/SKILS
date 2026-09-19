@@ -14,9 +14,19 @@ warn() { printf '  \033[33m!\033[0m  %s\n' "$1"; }
 err()  { printf '  \033[31mKO\033[0m %s\n' "$1"; }
 
 confirm() {
-  local reponse
+  local reponse=""
+  local sur_tty=0
   printf '\n\033[1m%s\033[0m\n' "$1"
-  read -r -p "  Continuer ? [o/N] " reponse
+  # npx et les CLI interactives avalent stdin : on lit sur le terminal quand
+  # il est réellement ouvrable, pas seulement present dans /dev.
+  if [[ -e /dev/tty ]] && (exec 3</dev/tty) 2>/dev/null; then
+    sur_tty=1
+  fi
+  if (( sur_tty )); then
+    read -r -p "  Continuer ? [o/N] " reponse < /dev/tty || reponse=""
+  else
+    read -r -p "  Continuer ? [o/N] " reponse || reponse=""
+  fi
   [[ "$reponse" == "o" || "$reponse" == "O" ]]
 }
 
@@ -48,7 +58,7 @@ do_find_skills() {
   Disque   : ~/.claude/skills/find-skills/ (5 Ko)" || return 1
 
   npx -y skills add vercel-labs/skills --skill find-skills \
-      --agent claude-code --global --yes \
+      --agent claude-code --global --yes < /dev/null \
     && ok "find-skills installé dans $CLAUDE_DIR/skills/find-skills/"
 }
 
@@ -101,7 +111,7 @@ do_ui_ux_pro_max() {
   fi
 
   npx -y skills add nextlevelbuilder/ui-ux-pro-max-skill --skill ui-ux-pro-max \
-      --agent claude-code $flag --yes \
+      --agent claude-code $flag --yes < /dev/null \
     && ok "ui-ux-pro-max installé dans $cible"
 }
 
@@ -118,7 +128,7 @@ do_task_observer() {
              Le verrou 'proposer, jamais appliquer' est OBLIGATOIRE." || return 1
 
   npx -y skills add rebelytics/one-skill-to-rule-them-all \
-      --agent claude-code --global --yes \
+      --agent claude-code --global --yes < /dev/null \
     && ok "task-observer installé dans $CLAUDE_DIR/skills/task-observer/"
 
   echo
